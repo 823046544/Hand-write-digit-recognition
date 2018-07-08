@@ -165,7 +165,7 @@ int main(int argc, char** argv) {
     string file_name = "";
 	if (argc == 2) file_name = file_name+*(argv+1)+".bmp";
 	else file_name = file_name+"1.bmp";
-	// A4_Correct(file_name);
+	A4_Correct(file_name);
 
 	printf("------------------DIGIT SEPERATION-------------------\n");
 	//pre
@@ -212,16 +212,15 @@ int main(int argc, char** argv) {
 		Paper_Graph.draw_line(B[i].x+B[i].w, B[i].y, B[i].x+B[i].w, B[i].y+B[i].h, black);
 		Paper_Graph.draw_line(B[i].x, B[i].y+B[i].h, B[i].x+B[i].w, B[i].y+B[i].h, black);
 	}
-
-	int num = 111;
 	Paper_Graph.display();
 	Paper_Graph = temp;
 
-	printf("------------------SVM PREDICT-------------------\n");
+	// printf("------------------SVM PREDICT-------------------\n");
 	//------------------------ 5. load the svm ----------------------------------------------------
     // cout << "开始导入SVM文件...\n";
     // Ptr<SVM> svm1 = Algorithm::load<SVM>("mnist_dataset/mnist_svm.xml");
     // cout << "成功导入SVM文件...\n";
+	printf("------------------CNN PREDICT-------------------\n");
 	float h_threshold = 0;
 	vector<int> H_list;
 	for (int i = 0; i < B.size(); i++) H_list.push_back(B[i].h);
@@ -262,54 +261,28 @@ int main(int argc, char** argv) {
 		// Paper_Graph.draw_text(B[i].x, B[i].y, res_s.c_str(), black, white);
 		// B[i].ans = res_s[0]-'0';
 
-		//save
 		string temp_dir = "./my_num/"+to_string(i) +".bmp";
 		number.save(temp_dir.c_str());
 	}
 	
 	freopen("line.csv","w",stdout);
 	printf("%d", (int)B.size());
-	for (int i = 0; i < B.size(); i++) {
-		// if (B[i].l > 1 && B[i].l > B[i-1].l) printf("\n");
-		// printf("%d", B[i].ans);
+	for (int i = 0; i < B.size(); i++)
 		if (i == B.size()-1 || B[i].l < B[i+1].l) printf(",%d", i);
-	}
-	// printf("\n");
 	fclose(stdout);
 	// Paper_Graph.display();
 
-
-
-
-	int MAXLINE = 1000;
-	char result_buf[MAXLINE], command[MAXLINE];
-	int rc = 0; // 用于接收命令返回值
+	printf("--------CALL PY----------\n");
+	char command[1000];
 	FILE *fp;
-
 	/*将要执行的命令写入buf*/
 	snprintf(command, sizeof(command), "python digit_rec.py");
-
 	/*执行预先设定的命令，并读出该命令的标准输出*/
 	fp = popen(command, "r");
 	if(NULL == fp) {
 		perror("popen执行失败！");
 		exit(1);
 	}
-	/*
-	while(fgets(result_buf, sizeof(result_buf), fp) != NULL) {
-		if('\n' == result_buf[strlen(result_buf)-1]) {
-			result_buf[strlen(result_buf)-1] = '\0';
-		}
-		printf("命令【%s】 输出【%s】\r\n", command, result_buf);
-	}
-
-	rc = pclose(fp);
-	if(-1 == rc) {
-		perror("关闭文件指针失败");
-		exit(1);
-	} else {
-		printf("命令【%s】子进程结束状态【%d】命令返回值【%d】\r\n", command, rc, WEXITSTATUS(rc));
-	}*/
 	printf("DONE");
 
 }

@@ -194,12 +194,10 @@ int A4_Correct(string file_name) {
 	Points_Graph.display("Lines");
 
 	/*find points*/
-	// Points_Graph.fill(0.0f);
 	cimg_forXY(Points_Graph, x, y) if (Points_Graph(x, y) && x > 0 && x < width-1 && y > 0 && y < height-1) {
 		int sum = 0;
 		for (int i = 0; i < 8; i++) if (Points_Graph(x+direct[i][0], y+direct[i][1]) && Points_Graph(x+direct[i][0], y+direct[i][1]) != Points_Graph(x, y))
 			sum = 1;
-			
 		if (sum) {
 			bool repetition = false;
 			for (int i = 0; i < points.size(); i++) {
@@ -215,6 +213,10 @@ int A4_Correct(string file_name) {
 	int _size = points.size();
 	printf("points\n%d\n", _size);
 	for (int i = 0; i < points.size(); i++) printf("%d %d\n", points[i].first, points[i].second);
+	/*output to answer.txt*/
+	freopen("../Answer.txt","w",stdout);
+	for (int i = 0; i < points.size(); i++) printf("%d %d\n", points[i].first, points[i].second);
+	fclose(stdout);
 
 	Points_Graph = Origin_Graph;
 	Graham(points);
@@ -224,9 +226,6 @@ int A4_Correct(string file_name) {
 		Points_Graph.draw_circle(x, y, 25, red, 1);
 	}
 	Points_Graph.display("Corner");
-
-
-
 
 	/*morphe*/
 	printf("------------------PAPER CORRECT-------------------\n");

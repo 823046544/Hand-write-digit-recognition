@@ -47,4 +47,7 @@ for i in range(L[0]):
     if (index < len(L) and i == L[index]):
         index = index+1
         Ans = Ans+'\n'
-print(Ans)
+
+file_path = '../Answer.txt'
+with open(file_path, 'a+') as f:
+    f.write(Ans)
