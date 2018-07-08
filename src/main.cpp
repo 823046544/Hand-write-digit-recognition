@@ -173,7 +173,7 @@ int main(int argc, char** argv) {
 	CImg<float> Trans_Graph(path.c_str());
 	int width = Trans_Graph._width;
 	int height = Trans_Graph._height;
-	int paper_width = width*3/4.0;
+	int paper_width = width*3/4.0; 
 	int paper_height = paper_width/210.0*297.0;
 	if (paper_height > height) {
 		paper_height = height*3/4.0;

@@ -213,11 +213,6 @@ int A4_Correct(string file_name) {
 	int _size = points.size();
 	printf("points\n%d\n", _size);
 	for (int i = 0; i < points.size(); i++) printf("%d %d\n", points[i].first, points[i].second);
-	/*output to answer.txt*/
-	freopen("../Answer.txt","w",stdout);
-	for (int i = 0; i < points.size(); i++) printf("%d %d\n", points[i].first, points[i].second);
-	fclose(stdout);
-
 	Points_Graph = Origin_Graph;
 	Graham(points);
 	for (int i = 0; i < points.size(); i++) {
@@ -226,6 +221,12 @@ int A4_Correct(string file_name) {
 		Points_Graph.draw_circle(x, y, 25, red, 1);
 	}
 	Points_Graph.display("Corner");
+
+	/*output to answer.txt*/
+	FILE *fp;  
+	fp = fopen("../Answer.txt", "w");
+	for (int i = 0; i < points.size(); i++) fprintf(fp , "%d %d\n", points[i].first, points[i].second);
+	fclose(fp);
 
 	/*morphe*/
 	printf("------------------PAPER CORRECT-------------------\n");
