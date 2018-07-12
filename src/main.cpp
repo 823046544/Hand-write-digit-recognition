@@ -137,7 +137,7 @@ void Search_Box(CImg<float> &Img, vector<box> &B) {
 				sqr(B[j].x-B[s].x)+sqr(B[j].y-B[s].y))
 					t = j;
 		}
-		if (sqr(B[t].x-B[s].x)+sqr(B[t].y-B[s].y) > 100) {
+		if (sqr(B[t].x-B[s].x)+sqr(B[t].y-B[s].y) > 3000) {
 			B.pop_back(); continue;
 		}
 		for (int x = B[s].x; x < B[s].x+B[s].w; x++)
@@ -155,7 +155,7 @@ void Search_Box(CImg<float> &Img, vector<box> &B) {
 	sort(B.begin(), B.end(), _cmp_box_size);
 	while (B.size() > 120) B.pop_back();
 	for (int i = B.size()-1; i > 0; i--) {
-		if (B[B.size()/2].w*B[B.size()/2].h/6 > B[i].w*B[i].h)
+		if (B[B.size()/2].w*B[B.size()/2].h/10 > B[i].w*B[i].h)
 			B.pop_back();
 		else break;
 	}
@@ -173,7 +173,7 @@ void Canny_Separate(CImg<float> &Paper_Graph) {
 		if (Img_edge(x, y) < 100) Img_edge(x, y) = 0;
 		else Img_edge(x, y) = 255;
 	}
-	Recover(Img_edge, 5);
+	Recover(Img_edge, 2);
 	// Img_edge.display("Recover");
 	int paper_width = Paper_Graph._width;
 	int paper_height = Paper_Graph._height;
