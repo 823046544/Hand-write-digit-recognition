@@ -155,15 +155,12 @@ int A4_Correct(string file_name) {
 		if (Img_edge(x, y) < 100) Img_edge(x, y) = 0;
 		else Img_edge(x, y) = 255;
 	}
-	// for (int i = 1; i <= 10; i++) Recover(Img_edge);
+	
 	Recover(Img_edge, 10);
-	Img_edge.display("Recover");
 	for (int i = Img_edge._width/2-25; i <= Img_edge._width/2+25; i++)
 		for (int j = Img_edge._height/2-25; j <= Img_edge._height/2+25; j++)
 			Detect_edge(Img_edge, i, j);
-	// Detect_edge(Img_edge, Img_edge._width/2, Img_edge._height/2);
-
-	Img_edge.display("OutLine_Detect_1");
+	
 	cimg_forXY(Img_edge, x, y) {
 		if (Img_edge(x, y) == 50) Img_edge(x, y) = 0;
 		else if (Img_edge(x, y) == 255) Img_edge(x, y) = 0;
