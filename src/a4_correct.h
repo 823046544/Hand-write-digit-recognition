@@ -10,37 +10,44 @@ const int red[] = {255, 0, 0}, green[] = {0, 255, 0},
 			blue[] = {0, 0, 255}, yellow[] = {255, 255, 0},
 			black[] = {0, 0, 0}, white[] = {255, 255, 255};
 int direct[8][2] = {{0,1},{0,-1},{-1,0},{1,0},{-1,1},{-1,1},{1,1},{1,-1}};
-//膨胀
-void Recover(CImg<float> &Img) {
-	// CImg<float> temp = Img;
-	// temp.fill(0.0f);
-	// int width = temp._width, height = temp._height;
-	// cimg_forXY(Img, x, y) if (Img(x, y) < 10 && x > 0 && x < width-1 && y > 0 && y < height-1) {
-	// 	int flag = 0;
-	// 	flag = 	(Img(x-1, y-1) + Img(x-1, y) + Img(x-1, y+1) > 1 ?1:0) + 
-	// 			(Img(x+1, y-1) + Img(x+1, y) + Img(x+1, y+1) > 1 ?1:0) + 
-	// 			(Img(x-1, y-1) + Img(x, y-1) + Img(x+1, y-1) > 1 ?1:0) + 
-	// 			(Img(x-1, y+1) + Img(x, y+1) + Img(x+1, y+1) > 1 ?1:0);
-	// 	if (flag >= 2) temp(x, y) = 255;
-	// }
-	// cimg_forXY(Img, x, y) Img(x, y) = max(Img(x, y), temp(x, y));
-	CImg<float> temp = Img;
-	temp.fill(0.0f);
-	int width = temp._width, height = temp._height;
+//膨胀 white
+void Recover(CImg<float> &Img, int T) {
+	CImg<int> temp = Img;
+	int maxx = 10 + temp._width * temp._height;
+	temp.fill(maxx);
+	vector< pair<int, int> > L;
+	L.clear();
 	int n_x, n_y;
-	cimg_forXY(Img, x, y) if (x > 0 && x < width-1 && y > 0 && y < height-1) {
-		int flag = 0;
+	cimg_forXY(Img, x, y) if (Img(x, y) > 100) {
+		temp(x, y) = 0;
+		L.push_back(make_pair(x, y));
+	}
+	for (int i = 0; i < L.size(); i++) {
+		int x = L[i].first, y = L[i].second;
 		for (int k = 0; k < 8; k++) {
 			n_x = x+direct[k][0];
 			n_y = y+direct[k][1];
 			if (n_x < 0 || n_x >= Img._width || n_y < 0 || n_y >= Img._height) continue;
-			if (Img(n_x, n_y) > 100) {
-				flag = 1; break;
-			}
+			if (temp(x, y) + 1 >= temp(n_x, n_y)) continue;
+			temp(n_x, n_y) = temp(x, y) + 1;
+			L.push_back(make_pair(n_x, n_y));
 		}
-		if (flag >= 1) temp(x, y) = 255;
 	}
-	cimg_forXY(Img, x, y) Img(x, y) = max(Img(x, y), temp(x, y));
+	cimg_forXY(Img, x, y) if (temp(x, y) <= T)
+		Img(x, y) = 255;
+	// cimg_forXY(Img, x, y) if (x > 0 && x < width-1 && y > 0 && y < height-1) {
+	// 	int flag = 0;
+	// 	for (int k = 0; k < 8; k++) {
+	// 		n_x = x+direct[k][0];
+	// 		n_y = y+direct[k][1];
+	// 		if (n_x < 0 || n_x >= Img._width || n_y < 0 || n_y >= Img._height) continue;
+	// 		if (Img(n_x, n_y) > 100) {
+	// 			flag = 1; break;
+	// 		}
+	// 	}
+	// 	if (flag >= 1) temp(x, y) = 255;
+	// }
+	// cimg_forXY(Img, x, y) Img(x, y) = max(Img(x, y), temp(x, y));
 }
 
 // from the edge erase the extra edge
@@ -58,6 +65,7 @@ void Erase_extra_edge(CImg<float> &Img, int x, int y) {
 
 //clear anything except the edge
 //100 as edge
+//50 as trash
 void Detect_edge(CImg<float> &Img_edge, int xx, int yy) {
 	Img_edge(xx, yy) = 50;
 	vector< pair<int, int> > L;
@@ -147,7 +155,8 @@ int A4_Correct(string file_name) {
 		if (Img_edge(x, y) < 100) Img_edge(x, y) = 0;
 		else Img_edge(x, y) = 255;
 	}
-	for (int i = 1; i <= 10; i++) Recover(Img_edge);
+	// for (int i = 1; i <= 10; i++) Recover(Img_edge);
+	Recover(Img_edge, 10);
 	Img_edge.display("Recover");
 	for (int i = Img_edge._width/2-25; i <= Img_edge._width/2+25; i++)
 		for (int j = Img_edge._height/2-25; j <= Img_edge._height/2+25; j++)
@@ -177,7 +186,7 @@ int A4_Correct(string file_name) {
 	CImg<float> HoughSpace;
 	// define thread
 	float in_thread = 10.0f;
-	float out_thread = 200.0f;
+	float out_thread = 150.0f;
 	hough(Img_edge, HoughSpace, lines, in_thread, out_thread);
 	const int width = Img_edge._width;
     const int height = Img_edge._height;

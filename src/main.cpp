@@ -157,12 +157,51 @@ void Search_Box(CImg<float> &Img, vector<box> &B) {
 	sort(B.begin(), B.end());
 }
 
+void Canny_Separate(CImg<float> &Paper_Graph) {
+	float sigma = 1.5f;
+	float threshold = 4.0f;
+	CImg<float> Img_edge;
+    CannyDiscrete(Paper_Graph, sigma, threshold, Img_edge);
+    Img_edge.display("non-maximum suppression");
+
+	cimg_forXY(Img_edge, x, y) {
+		if (Img_edge(x, y) < 100) Img_edge(x, y) = 0;
+		else Img_edge(x, y) = 255;
+	}
+	Recover(Img_edge, 5);
+	Img_edge.display("Recover");
+	int paper_width = Paper_Graph._width;
+	int paper_height = Paper_Graph._height;
+	int frame_threshold = 10;
+	cimg_forXY(Paper_Graph, x, y) {
+		if (x <= frame_threshold || y <= frame_threshold || paper_width-x <= frame_threshold || paper_height-y <= frame_threshold) {
+			if (Img_edge(x, y) <= 10)
+				Detect_edge(Img_edge, x, y);
+		}
+	}
+	float color_threshold = 160;
+	cimg_forXY(Paper_Graph, x, y) {
+		if (fabs(Img_edge(x, y)-50) < 1) Paper_Graph(x, y) = 255;
+		if (Paper_Graph(x, y) > color_threshold) Paper_Graph(x, y) = 255;
+		else Paper_Graph(x, y) = 0;
+	}
+	for (int i = 1; i <= 2; i++) Expand_black(Paper_Graph);
+	cimg_forXY(Paper_Graph, x, y) {
+		if (x <= frame_threshold || y <= frame_threshold || paper_width-x <= frame_threshold || paper_height-y <= frame_threshold) {
+			if (Paper_Graph(x, y) < 100) {
+				Erase_extra_disturb(Paper_Graph, x, y);
+			}
+		}
+	}
+	Paper_Graph.display("Origin");
+}
+
 int main(int argc, char** argv) {
 	
     string file_name = "";
 	if (argc == 2) file_name = file_name+*(argv+1)+".bmp";
 	else file_name = file_name+"1.bmp";
-	A4_Correct(file_name);
+	//A4_Correct(file_name);
 
 	printf("------------------DIGIT SEPERATION-------------------\n");
 	//pre
@@ -182,22 +221,17 @@ int main(int argc, char** argv) {
 	Paper_Graph.assign(paper_width, paper_height);
 	cimg_forXY(Paper_Graph, x, y) {
 		Paper_Graph(x, y) = Trans_Graph((width-paper_width)/2+x, (height-paper_height)/2+y);
-		if (Paper_Graph(x, y) < 125)
-			Paper_Graph(x, y) = 0;
-		else
-			Paper_Graph(x, y) = 255;
+		// if (Paper_Graph(x, y) < 125)
+		// 	Paper_Graph(x, y) = 0;
+		// else
+		// 	Paper_Graph(x, y) = 255;
 	}
-	Paper_Graph.display("Origin");
-	for (int i = 1; i <= 2; i++) Expand_black(Paper_Graph);
 
-	int frame_threshold = 10;
-	cimg_forXY(Paper_Graph, x, y) {
-		if (x <= frame_threshold || y <= frame_threshold || paper_width-x <= frame_threshold || paper_height-y <= frame_threshold) {
-			if (Paper_Graph(x, y) < 100) {
-				Erase_extra_disturb(Paper_Graph, x, y);
-			}
-		}
-	}
+	// use canny to separate
+	Canny_Separate(Paper_Graph);
+    
+	
+	
 	vector<box> B;
 	B.clear();
 	Search_Box(Paper_Graph, B);
@@ -215,7 +249,7 @@ int main(int argc, char** argv) {
 	//------------------------ 5. load the svm ----------------------------------------------------
     // cout << "开始导入SVM文件...\n";
     // Ptr<SVM> svm1 = Algorithm::load<SVM>("mnist_dataset/mnist_svm.xml");
-    // cout << "成功导入SVM文件...\n"; 
+    // cout << "成功导入SVM文件...\n";
 	printf("------------------CNN PREDICT-------------------\n");
 	float h_threshold = 0;
 	vector<int> H_list;
@@ -230,7 +264,7 @@ int main(int argc, char** argv) {
 	}
 	sort(B.begin(), B.end(), _cmp_box_location);
 
-	/*rec*/
+	/*rec*/ 
 	for (int i = 0; i < B.size(); i++) {
 		CImg<float> number;
 		int _size = round(max(B[i].w+1, B[i].h+1)) * 1.3;

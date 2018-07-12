@@ -19,6 +19,7 @@
         "iostream": "cpp",
         "ratio": "cpp",
         "type_traits": "cpp",
-        "chrono": "cpp"
+        "chrono": "cpp",
+        "*.tcc": "cpp"
     }
 }

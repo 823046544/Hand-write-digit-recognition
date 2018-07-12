@@ -36,13 +36,15 @@ void hough(const CImg<float> &img, CImg<float> &HoughSpace,
         if (HoughSpace(i, offset) > out_thread) {
             bool repetition = false;
             for (int t = 0; t < lines.size(); t++)
-                if (abs(i-lines[t].first) <= 2 && abs(offset-lines[t].second) <= 30) {
+                if (abs(i-lines[t].first) <= 5 && abs(offset-lines[t].second) <= 50) {
                     // cout << "delete " << i << " " << offset << "  ;  " << lines[t].first << " " << lines[t].second << endl; 
                     // printf("Delete %d %d due to %d %d\n", i, offset, lines[t].first, lines[t].second);
                     repetition = true;
                     break;
                 }
+            if (lines.size() >= 4) break;
             if (!repetition && offset > 1) lines.push_back(make_pair(i, offset));
+            if (lines.size() >= 4) break;
         }
     }
 
