@@ -141,10 +141,12 @@ void Search_Box(CImg<float> &Img, vector<box> &B) {
 			for (int y = B[s].y; y < B[s].y+B[s].h; y++) if (fabs(Img(x, y)+B[s].id) < 0.5)
 				Img(x, y) = -B[t].id;
 		int x = B[t].x, y = B[t].y;
+		int x1 = max(B[t].x+B[t].w, B[s].x+B[s].w);
+		int y1 = max(B[t].y+B[t].h, B[s].y+B[s].h);
 		B[t].x = min(B[t].x, B[s].x);
 		B[t].y = min(B[t].y, B[s].y);
-		B[t].w = max((B[t].w, B[s].w), B[s].x+B[s].w-1-x);
-		B[t].h = max((B[t].h, B[s].h), y+B[t].h-1-B[t].y);
+		B[t].w = x1 - B[t].x;
+		B[t].h = y1 - B[t].y;
 		B.pop_back();
 	}
 	sort(B.begin(), B.end(), _cmp_box_size);
