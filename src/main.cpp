@@ -81,7 +81,6 @@ void Expand_black(CImg<float> &Img) {
 	cimg_forXY(Img, x, y) Img(x, y) = min(Img(x, y), temp(x, y));
 }
 
-
 struct box{
 	int x, y, w, h, id;
 	int ans, l;
@@ -191,7 +190,7 @@ int main(int argc, char** argv) {
 	Paper_Graph.display("Origin");
 	for (int i = 1; i <= 2; i++) Expand_black(Paper_Graph);
 
-	int frame_threshold = 5;
+	int frame_threshold = 10;
 	cimg_forXY(Paper_Graph, x, y) {
 		if (x <= frame_threshold || y <= frame_threshold || paper_width-x <= frame_threshold || paper_height-y <= frame_threshold) {
 			if (Paper_Graph(x, y) < 100) {
@@ -216,13 +215,13 @@ int main(int argc, char** argv) {
 	//------------------------ 5. load the svm ----------------------------------------------------
     // cout << "开始导入SVM文件...\n";
     // Ptr<SVM> svm1 = Algorithm::load<SVM>("mnist_dataset/mnist_svm.xml");
-    // cout << "成功导入SVM文件...\n";
+    // cout << "成功导入SVM文件...\n"; 
 	printf("------------------CNN PREDICT-------------------\n");
 	float h_threshold = 0;
 	vector<int> H_list;
 	for (int i = 0; i < B.size(); i++) H_list.push_back(B[i].h);
 	sort(H_list.begin(), H_list.end());
-	//中位数
+	//中位数 
 	h_threshold = H_list[H_list.size()/2];
 	B[0].l = 1;
 	for (int i = 1; i < B.size(); i++) {

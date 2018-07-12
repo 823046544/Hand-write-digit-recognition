@@ -12,16 +12,33 @@ const int red[] = {255, 0, 0}, green[] = {0, 255, 0},
 int direct[8][2] = {{0,1},{0,-1},{-1,0},{1,0},{-1,1},{-1,1},{1,1},{1,-1}};
 //膨胀
 void Recover(CImg<float> &Img) {
+	// CImg<float> temp = Img;
+	// temp.fill(0.0f);
+	// int width = temp._width, height = temp._height;
+	// cimg_forXY(Img, x, y) if (Img(x, y) < 10 && x > 0 && x < width-1 && y > 0 && y < height-1) {
+	// 	int flag = 0;
+	// 	flag = 	(Img(x-1, y-1) + Img(x-1, y) + Img(x-1, y+1) > 1 ?1:0) + 
+	// 			(Img(x+1, y-1) + Img(x+1, y) + Img(x+1, y+1) > 1 ?1:0) + 
+	// 			(Img(x-1, y-1) + Img(x, y-1) + Img(x+1, y-1) > 1 ?1:0) + 
+	// 			(Img(x-1, y+1) + Img(x, y+1) + Img(x+1, y+1) > 1 ?1:0);
+	// 	if (flag >= 2) temp(x, y) = 255;
+	// }
+	// cimg_forXY(Img, x, y) Img(x, y) = max(Img(x, y), temp(x, y));
 	CImg<float> temp = Img;
 	temp.fill(0.0f);
 	int width = temp._width, height = temp._height;
-	cimg_forXY(Img, x, y) if (Img(x, y) < 10 && x > 0 && x < width-1 && y > 0 && y < height-1) {
+	int n_x, n_y;
+	cimg_forXY(Img, x, y) if (x > 0 && x < width-1 && y > 0 && y < height-1) {
 		int flag = 0;
-		flag = 	(Img(x-1, y-1) + Img(x-1, y) + Img(x-1, y+1) > 1 ?1:0) + 
-				(Img(x+1, y-1) + Img(x+1, y) + Img(x+1, y+1) > 1 ?1:0) + 
-				(Img(x-1, y-1) + Img(x, y-1) + Img(x+1, y-1) > 1 ?1:0) + 
-				(Img(x-1, y+1) + Img(x, y+1) + Img(x+1, y+1) > 1 ?1:0);
-		if (flag >= 2) temp(x, y) = 255;
+		for (int k = 0; k < 8; k++) {
+			n_x = x+direct[k][0];
+			n_y = y+direct[k][1];
+			if (n_x < 0 || n_x >= Img._width || n_y < 0 || n_y >= Img._height) continue;
+			if (Img(n_x, n_y) > 100) {
+				flag = 1; break;
+			}
+		}
+		if (flag >= 1) temp(x, y) = 255;
 	}
 	cimg_forXY(Img, x, y) Img(x, y) = max(Img(x, y), temp(x, y));
 }
@@ -111,9 +128,7 @@ int A4_Correct(string file_name) {
 	float threshold = 4.0f;
 
     CImg<float> in(infile.c_str());
-	if (in.width < 2000) {
-		
-	}
+	if (in._width < 2300) in.resize(2300, (int)(2300/in._width*in._height));
 	CImg<float> Origin_Graph = in;
 	const int widthIn = in._width;
 	const int heightIn = in._height;
@@ -128,18 +143,18 @@ int A4_Correct(string file_name) {
     CannyDiscrete(in, sigma, threshold, Img_edge);
     Img_edge.display("non-maximum suppression");
 
-	//100 as threshold
 	cimg_forXY(Img_edge, x, y) {
 		if (Img_edge(x, y) < 100) Img_edge(x, y) = 0;
 		else Img_edge(x, y) = 255;
-		if (!Img_edge(x, y)) continue;
-		int frame_eps = 25;
-		if ((x <= frame_eps || x >= widthIn-1-frame_eps) || (y <= frame_eps || y >= heightIn-1-frame_eps)) {
-			Erase_extra_edge(Img_edge, x, y);
-		}
 	}
-	for (int i = 1; i <= 2; i++) Recover(Img_edge);
-	Detect_edge(Img_edge, Img_edge._width/2, Img_edge._height/2);
+	for (int i = 1; i <= 10; i++) Recover(Img_edge);
+	Img_edge.display("Recover");
+	for (int i = Img_edge._width/2-25; i <= Img_edge._width/2+25; i++)
+		for (int j = Img_edge._height/2-25; j <= Img_edge._height/2+25; j++)
+			Detect_edge(Img_edge, i, j);
+	// Detect_edge(Img_edge, Img_edge._width/2, Img_edge._height/2);
+
+	Img_edge.display("OutLine_Detect_1");
 	cimg_forXY(Img_edge, x, y) {
 		if (Img_edge(x, y) == 50) Img_edge(x, y) = 0;
 		else if (Img_edge(x, y) == 255) Img_edge(x, y) = 0;
@@ -162,7 +177,7 @@ int A4_Correct(string file_name) {
 	CImg<float> HoughSpace;
 	// define thread
 	float in_thread = 10.0f;
-	float out_thread = 150.0f;
+	float out_thread = 200.0f;
 	hough(Img_edge, HoughSpace, lines, in_thread, out_thread);
 	const int width = Img_edge._width;
     const int height = Img_edge._height;
