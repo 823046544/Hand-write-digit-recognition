@@ -14,8 +14,6 @@ using namespace cimg_library;
 using namespace std;
 using namespace cv;
 using namespace cv::ml;
-// int direct[8][2] = {{0,1},{0,-1},{-1,0},{1,0},{-1,1},{-1,1},{1,1},{1,-1}};
-
 
 // bfs erase disturb for seperation
 void Erase_extra_disturb(CImg<float> &Img, int x, int y) {
@@ -190,13 +188,12 @@ int main(int argc, char** argv) {
 		else
 			Paper_Graph(x, y) = 255;
 	}
-	
 	Paper_Graph.display("Origin");
 	for (int i = 1; i <= 2; i++) Expand_black(Paper_Graph);
-	// Paper_Graph.display("Expand");
 
+	int frame_threshold = 5;
 	cimg_forXY(Paper_Graph, x, y) {
-		if (x <= 20 || y <= 20 || paper_width-x <= 20 || paper_height-y <= 20) {
+		if (x <= frame_threshold || y <= frame_threshold || paper_width-x <= frame_threshold || paper_height-y <= frame_threshold) {
 			if (Paper_Graph(x, y) < 100) {
 				Erase_extra_disturb(Paper_Graph, x, y);
 			}
