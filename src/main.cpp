@@ -138,7 +138,7 @@ void Search_Box(CImg<float> &Img, vector<box> &B) {
 					t = j;
 		}
 		if (sqr(B[t].x-B[s].x)+sqr(B[t].y-B[s].y) > 100) {
-			B.pop(); continue;
+			B.pop_back(); continue;
 		}
 		for (int x = B[s].x; x < B[s].x+B[s].w; x++)
 			for (int y = B[s].y; y < B[s].y+B[s].h; y++) if (fabs(Img(x, y)+B[s].id) < 0.5)

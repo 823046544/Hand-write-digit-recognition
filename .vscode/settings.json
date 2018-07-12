@@ -20,6 +20,7 @@
         "ratio": "cpp",
         "type_traits": "cpp",
         "chrono": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "list": "cpp"
     }
 }
