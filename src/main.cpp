@@ -183,7 +183,7 @@ int main(int argc, char** argv) {
 	Paper_Graph.assign(paper_width, paper_height);
 	cimg_forXY(Paper_Graph, x, y) {
 		Paper_Graph(x, y) = Trans_Graph((width-paper_width)/2+x, (height-paper_height)/2+y);
-		if (Paper_Graph(x, y) < 120)
+		if (Paper_Graph(x, y) < 125)
 			Paper_Graph(x, y) = 0;
 		else
 			Paper_Graph(x, y) = 255;

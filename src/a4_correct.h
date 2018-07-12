@@ -111,6 +111,9 @@ int A4_Correct(string file_name) {
 	float threshold = 4.0f;
 
     CImg<float> in(infile.c_str());
+	if (in.width < 2000) {
+		
+	}
 	CImg<float> Origin_Graph = in;
 	const int widthIn = in._width;
 	const int heightIn = in._height;
@@ -159,7 +162,7 @@ int A4_Correct(string file_name) {
 	CImg<float> HoughSpace;
 	// define thread
 	float in_thread = 10.0f;
-	float out_thread = 200.0f;
+	float out_thread = 150.0f;
 	hough(Img_edge, HoughSpace, lines, in_thread, out_thread);
 	const int width = Img_edge._width;
     const int height = Img_edge._height;
