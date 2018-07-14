@@ -208,7 +208,7 @@ int main(int argc, char** argv) {
 	else file_name = file_name+"1.bmp";
 	A4_Correct(file_name);
 
-	printf("------------------DIGIT SEPERATION-------------------\n");
+	printf("------------------DIGIT SEPARATION-------------------\n");
 	//pre
 	string path = "../Output/"+file_name;
 	CImg<float> Trans_Graph(path.c_str());

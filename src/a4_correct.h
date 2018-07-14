@@ -35,19 +35,6 @@ void Recover(CImg<float> &Img, int T) {
 	}
 	cimg_forXY(Img, x, y) if (temp(x, y) <= T)
 		Img(x, y) = 255;
-	// cimg_forXY(Img, x, y) if (x > 0 && x < width-1 && y > 0 && y < height-1) {
-	// 	int flag = 0;
-	// 	for (int k = 0; k < 8; k++) {
-	// 		n_x = x+direct[k][0];
-	// 		n_y = y+direct[k][1];
-	// 		if (n_x < 0 || n_x >= Img._width || n_y < 0 || n_y >= Img._height) continue;
-	// 		if (Img(n_x, n_y) > 100) {
-	// 			flag = 1; break;
-	// 		}
-	// 	}
-	// 	if (flag >= 1) temp(x, y) = 255;
-	// }
-	// cimg_forXY(Img, x, y) Img(x, y) = max(Img(x, y), temp(x, y));
 }
 
 // from the edge erase the extra edge
@@ -136,7 +123,11 @@ int A4_Correct(string file_name) {
 	float threshold = 4.0f;
 
     CImg<float> in(infile.c_str());
-	if (in._width < 2300) in.resize(2300, (int)(2300/in._width*in._height));
+	float point_index_correct = 1.0;
+	if (in._width < 2300) {
+		point_index_correct = 2300.0/in._width;
+		in.resize(2300, (int)(2300.0/in._width*in._height));
+	}
 	CImg<float> Origin_Graph = in;
 	const int widthIn = in._width;
 	const int heightIn = in._height;
@@ -249,7 +240,8 @@ int A4_Correct(string file_name) {
 	/*output to answer.txt*/
 	FILE *fp;  
 	fp = fopen("../Answer.txt", "w");
-	for (int i = 0; i < points.size(); i++) fprintf(fp , "%d %d\n", points[i].first, points[i].second);
+	for (int i = 0; i < points.size(); i++)
+		fprintf(fp , "%d %d\n", (int)(points[i].first/point_index_correct), (int)(points[i].second/point_index_correct));
 	fclose(fp);
 
 	/*morphe*/
