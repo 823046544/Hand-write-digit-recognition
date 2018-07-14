@@ -13,6 +13,7 @@ from PIL import Image
 from keras import backend as K
 import cv2
 import csv
+import sys
 
 L = []
 with open('line.csv') as csv_file:
@@ -48,6 +49,7 @@ for i in range(L[0]):
         index = index+1
         Ans = Ans+'\n'
 
-file_path = '../Answer.txt'
+file_name = sys.argv[1]
+file_path = '../Ans/'+file_name+'.txt'
 with open(file_path, 'a+') as f:
     f.write(Ans)

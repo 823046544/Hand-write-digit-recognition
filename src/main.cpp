@@ -204,13 +204,13 @@ void Canny_Separate(CImg<float> &Paper_Graph) {
 int main(int argc, char** argv) {
 	
     string file_name = "";
-	if (argc == 2) file_name = file_name+*(argv+1)+".bmp";
-	else file_name = file_name+"1.bmp";
+	if (argc == 2) file_name = file_name+*(argv+1);
+	else file_name = file_name+"1";
 	A4_Correct(file_name);
 
 	printf("------------------DIGIT SEPARATION-------------------\n");
-	//pre
-	string path = "../Output/"+file_name;
+	//pre input
+	string path = "../Output/"+file_name+".bmp";
 	CImg<float> Trans_Graph(path.c_str());
 	int width = Trans_Graph._width;
 	int height = Trans_Graph._height;
@@ -263,7 +263,7 @@ int main(int argc, char** argv) {
 	}
 	sort(B.begin(), B.end(), _cmp_box_location);
 
-	/*rec*/ 
+	/*digit recognize*/ 
 	for (int i = 0; i < B.size(); i++) {
 		CImg<float> number;
 		int _size = round(max(B[i].w+1, B[i].h+1)) * 1.3;
@@ -305,7 +305,8 @@ int main(int argc, char** argv) {
 	char command[1000];
 	FILE *fp;
 	/*将要执行的命令写入buf*/
-	snprintf(command, sizeof(command), "python digit_rec.py");
+	string python_order = "python digit_rec.py "+file_name;
+	snprintf(command, sizeof(command), python_order.c_str());
 	/*执行预先设定的命令，并读出该命令的标准输出*/
 	fp = popen(command, "r");
 	if(NULL == fp) {

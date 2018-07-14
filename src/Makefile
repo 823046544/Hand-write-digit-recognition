@@ -1,6 +1,6 @@
 GFLAG = -I. -lm -lX11 -lpthread \
 		-Wfatal-errors -std=c++11 -pedantic\
-		-Dcimg_use_vt100 -g \
+		-Dcimg_use_vt100 -g -O3\
 		`pkg-config opencv --libs --cflags` \
 	
 objects = main.cpp

@@ -117,7 +117,7 @@ struct triangle {
 int A4_Correct(string file_name) {
     
     string infile = "../Dataset/";      // required input filename
-    infile = infile+file_name;
+    infile = infile+file_name+".bmp";
 
     float sigma = 1.5f;
 	float threshold = 4.0f;
@@ -237,9 +237,10 @@ int A4_Correct(string file_name) {
 	}
 	Points_Graph.display("Corner");
 
-	/*output to answer.txt*/
-	FILE *fp;  
-	fp = fopen("../Answer.txt", "w");
+	/*output to ../Ans/file_name.txt*/
+	FILE *fp;
+	string output_file_name = "../Ans/"+file_name+".txt";
+	fp = fopen(output_file_name.c_str(), "w");
 	for (int i = 0; i < points.size(); i++)
 		fprintf(fp , "%d %d\n", (int)(points[i].first/point_index_correct), (int)(points[i].second/point_index_correct));
 	fclose(fp);
@@ -311,6 +312,6 @@ int A4_Correct(string file_name) {
 	Trans_Graph.display();
 
 	string outfile = "../Output/";      // required input filename
-	outfile = outfile+file_name;
+	outfile = outfile+file_name+".bmp";
 	Trans_Graph.save(outfile.c_str());
 }

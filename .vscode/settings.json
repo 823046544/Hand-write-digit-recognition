@@ -21,6 +21,8 @@
         "type_traits": "cpp",
         "chrono": "cpp",
         "*.tcc": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "typeindex": "cpp",
+        "typeinfo": "cpp"
     }
 }
