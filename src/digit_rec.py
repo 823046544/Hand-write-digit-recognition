@@ -27,7 +27,7 @@ model = load_model('./cnn_model.h5')
 Ans = ''
 index = 1
 for i in range(L[0]):
-    img = cv2.imread('./my_num/'+str(i)+'.bmp', cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread('./my_num/'+str(i)+'.jpg', cv2.IMREAD_GRAYSCALE)
     # img.show()
     a = []
     for x in range(28):

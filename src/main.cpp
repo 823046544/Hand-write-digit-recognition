@@ -173,7 +173,7 @@ void Canny_Separate(CImg<float> &Paper_Graph) {
 		if (Img_edge(x, y) < 100) Img_edge(x, y) = 0;
 		else Img_edge(x, y) = 255;
 	}
-	Recover(Img_edge, 2);
+	Recover(Img_edge, 3);
 	// Img_edge.display("Recover");
 	int paper_width = Paper_Graph._width;
 	int paper_height = Paper_Graph._height;
@@ -184,9 +184,10 @@ void Canny_Separate(CImg<float> &Paper_Graph) {
 				Detect_edge(Img_edge, x, y);
 		}
 	}
-	float color_threshold = 160;
+	float color_threshold = 120;
 	cimg_forXY(Paper_Graph, x, y) {
 		if (fabs(Img_edge(x, y)-50) < 1) Paper_Graph(x, y) = 255;
+		if (Img_edge(x, y) > 250 && Paper_Graph(x, y) < color_threshold+40) Paper_Graph(x, y) = 0;
 		if (Paper_Graph(x, y) > color_threshold) Paper_Graph(x, y) = 255;
 		else Paper_Graph(x, y) = 0;
 	}
@@ -209,8 +210,8 @@ int main(int argc, char** argv) {
 	A4_Correct(file_name);
 
 	printf("------------------DIGIT SEPARATION-------------------\n");
-	//pre input
-	string path = "../Output/"+file_name+".bmp";
+	//pre input 
+	string path = "../Output/"+file_name+".jpg";
 	CImg<float> Trans_Graph(path.c_str());
 	int width = Trans_Graph._width;
 	int height = Trans_Graph._height;
@@ -290,7 +291,7 @@ int main(int argc, char** argv) {
 		// Paper_Graph.draw_text(B[i].x, B[i].y, res_s.c_str(), black, white);
 		// B[i].ans = res_s[0]-'0';
 
-		string temp_dir = "./my_num/"+to_string(i) +".bmp";
+		string temp_dir = "./my_num/"+to_string(i) +".jpg";
 		number.save(temp_dir.c_str());
 	}
 	

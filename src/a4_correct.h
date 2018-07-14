@@ -117,7 +117,7 @@ struct triangle {
 int A4_Correct(string file_name) {
     
     string infile = "../Dataset/";      // required input filename
-    infile = infile+file_name+".bmp";
+    infile = infile+file_name+".jpg";
 
     float sigma = 1.5f;
 	float threshold = 4.0f;
@@ -312,6 +312,6 @@ int A4_Correct(string file_name) {
 	Trans_Graph.display();
 
 	string outfile = "../Output/";      // required input filename
-	outfile = outfile+file_name+".bmp";
+	outfile = outfile+file_name+".jpg";
 	Trans_Graph.save(outfile.c_str());
 }
