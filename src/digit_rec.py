@@ -24,6 +24,7 @@ with open('line.csv') as csv_file:
 
 K.set_image_dim_ordering('th')
 model = load_model('./cnn_model.h5')
+# model = load_model('./nn_model.h5')
 Ans = ''
 index = 1
 for i in range(L[0]):
@@ -48,6 +49,8 @@ for i in range(L[0]):
     if (index < len(L) and i == L[index]):
         index = index+1
         Ans = Ans+'\n'
+        if (len(Ans) < 3):
+            Ans = ''
 
 file_name = sys.argv[1]
 file_path = '../Ans/'+file_name+'.txt'
