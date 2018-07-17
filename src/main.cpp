@@ -77,7 +77,7 @@ void Expand_black(CImg<float> &Img) {
 			}
 		}
 		if (flag >= 1) temp(x, y) = 0;
-	}
+	} 
 	cimg_forXY(Img, x, y) Img(x, y) = min(Img(x, y), temp(x, y));
 }
 
@@ -167,14 +167,12 @@ void Canny_Separate(CImg<float> &Paper_Graph) {
 	float threshold = 4.0f;
 	CImg<float> Img_edge;
     CannyDiscrete(Paper_Graph, sigma, threshold, Img_edge);
-    // Img_edge.display("non-maximum suppression");
 
 	cimg_forXY(Img_edge, x, y) {
 		if (Img_edge(x, y) < 100) Img_edge(x, y) = 0;
 		else Img_edge(x, y) = 255;
 	}
 	Recover(Img_edge, 3);
-	// Img_edge.display("Recover");
 	int paper_width = Paper_Graph._width;
 	int paper_height = Paper_Graph._height;
 	int frame_threshold = 10;
@@ -204,13 +202,14 @@ void Canny_Separate(CImg<float> &Paper_Graph) {
 
 int main(int argc, char** argv) {
 	
+	/* Use A4  correct */
     string file_name = "";
 	if (argc == 2) file_name = file_name+*(argv+1);
 	else file_name = file_name+"1";
 	A4_Correct(file_name);
 
+	/* Input the correct graph */ 
 	printf("------------------DIGIT SEPARATION-------------------\n");
-	//pre input 
 	string path = "../Output/"+file_name+".jpg";
 	CImg<float> Trans_Graph(path.c_str());
 	int width = Trans_Graph._width;
@@ -220,8 +219,7 @@ int main(int argc, char** argv) {
 	if (paper_height > height) {
 		paper_height = height*3/4.0;
 		paper_width = paper_height/297.0*210.0;
-	} 
-	
+	}
 	Trans_Graph = Trans_Graph.get_channel(0);
 	CImg<float> Paper_Graph;
 	Paper_Graph.assign(paper_width, paper_height);
@@ -229,12 +227,15 @@ int main(int argc, char** argv) {
 		Paper_Graph(x, y) = Trans_Graph((width-paper_width)/2+x, (height-paper_height)/2+y);
 	}
 
-	// use canny to separate
+	/* use canny to separate front and back */
 	Canny_Separate(Paper_Graph);	
 	
+	/* find independent digits */
 	vector<box> B;
 	B.clear();
 	Search_Box(Paper_Graph, B);
+	
+	/* Draw the boxes */
 	CImg<float> temp = Paper_Graph;
 	for (int i = 0; i < B.size(); i++) {
 		Paper_Graph.draw_line(B[i].x, B[i].y, B[i].x+B[i].w, B[i].y, black);
@@ -245,26 +246,22 @@ int main(int argc, char** argv) {
 	Paper_Graph.display();
 	Paper_Graph = temp;
 
-	// printf("------------------SVM PREDICT-------------------\n");
-	//------------------------ 5. load the svm ----------------------------------------------------
-    // cout << "开始导入SVM文件...\n";
-    // Ptr<SVM> svm1 = Algorithm::load<SVM>("mnist_dataset/mnist_svm.xml");
-    // cout << "成功导入SVM文件...\n";
+	/* CNN digit recognize */
 	printf("------------------CNN PREDICT-------------------\n");
+	//half of the max height as threshold
 	float h_threshold = 0;
-	vector<int> H_list;
-	for (int i = 0; i < B.size(); i++) H_list.push_back(B[i].h);
-	sort(H_list.begin(), H_list.end());
-	//中位数 
-	h_threshold = H_list[H_list.size()/2];
+	for (int i = 0; i < B.size(); i++) if (B[i].h > h_threshold)
+		h_threshold = B[i].h;
+	h_threshold /= 2;
 	B[0].l = 1;
+	//separate lines
 	for (int i = 1; i < B.size(); i++) {
 		if (B[i].y - B[i-1].y > h_threshold) B[i].l = B[i-1].l+1;
-		else B[i].l = B[i-1].l;
+		else B[i].l = B[i-1].l; 
 	}
 	sort(B.begin(), B.end(), _cmp_box_location);
 
-	/*digit recognize*/ 
+	/*digit recognize*/
 	for (int i = 0; i < B.size(); i++) {
 		CImg<float> number;
 		int _size = round(max(B[i].w+1, B[i].h+1)) * 1.3;
@@ -285,22 +282,16 @@ int main(int argc, char** argv) {
 				num_mat.at<float>(0, x*28+y) = value;
 				num_show.at<float>(x, y) = value;
 			}
-		// float result = svm1->predict(num_mat);
-		// string res_s = to_string(result);
-		// res_s = res_s[0];
-		// Paper_Graph.draw_text(B[i].x, B[i].y, res_s.c_str(), black, white);
-		// B[i].ans = res_s[0]-'0';
-
 		string temp_dir = "./my_num/"+to_string(i) +".jpg";
 		number.save(temp_dir.c_str());
 	}
 	
+	/*output lines flag*/
 	freopen("line.csv","w",stdout);
 	printf("%d", (int)B.size());
 	for (int i = 0; i < B.size(); i++)
 		if (i == B.size()-1 || B[i].l < B[i+1].l) printf(",%d", i);
 	fclose(stdout);
-	// Paper_Graph.display();
 
 	printf("--------CALL PY----------\n");
 	char command[1000];

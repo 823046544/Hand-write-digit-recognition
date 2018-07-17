@@ -116,15 +116,16 @@ struct triangle {
 
 int A4_Correct(string file_name) {
     
-    string infile = "../Dataset/";      // required input filename
+	/* input file due to file_name */
+    string infile = "../Dataset/";
     infile = infile+file_name+".jpg";
-
-    float sigma = 1.5f;
-	float threshold = 4.0f;
-
     CImg<float> in(infile.c_str());
+	// handle some weired rotate 90 ??
+	if (in._width > in._height) {
+		in.rotate(90);
+	}
 	float point_index_correct = 1.0;
-	if (in._width < 2300) {
+	if (in._width < 2300 || in._width > 2500) {
 		point_index_correct = 2300.0/in._width;
 		in.resize(2300, (int)(2300.0/in._width*in._height));
 	}
@@ -139,19 +140,19 @@ int A4_Correct(string file_name) {
 
 	/*handle the edge*/
 	CImg<float> Img_edge;
+    float sigma = 1.5f;
+	float threshold = 4.0f;
     CannyDiscrete(in, sigma, threshold, Img_edge);
     Img_edge.display("non-maximum suppression");
-
 	cimg_forXY(Img_edge, x, y) {
 		if (Img_edge(x, y) < 100) Img_edge(x, y) = 0;
 		else Img_edge(x, y) = 255;
 	}
-	
-	Recover(Img_edge, 10);
+	// erase noise
+	Recover(Img_edge, 20);
 	for (int i = Img_edge._width/2-25; i <= Img_edge._width/2+25; i++)
 		for (int j = Img_edge._height/2-25; j <= Img_edge._height/2+25; j++)
 			Detect_edge(Img_edge, i, j);
-	
 	cimg_forXY(Img_edge, x, y) {
 		if (Img_edge(x, y) == 50) Img_edge(x, y) = 0;
 		else if (Img_edge(x, y) == 255) Img_edge(x, y) = 0;
@@ -165,28 +166,24 @@ int A4_Correct(string file_name) {
 		else if (Img_edge(x, y) == 100) Img_edge(x, y) = 255;
 		else Img_edge(x, y) = 0;
 	}
-	
 	Img_edge.display("OutLine_Detect");
 
-	/*handle the lines*/
+	/* handle the lines */
 	vector< pair<int, int> > lines;
 	lines.clear();
 	CImg<float> HoughSpace;
-	// define thread
 	float in_thread = 10.0f;
-	float out_thread = 150.0f;
+	float out_thread = 100.0f;
 	hough(Img_edge, HoughSpace, lines, in_thread, out_thread);
 	const int width = Img_edge._width;
     const int height = Img_edge._height;
     const float diagonal = sqrt(sqr(width)+sqr(height));
     const int offset_n = (int)diagonal;
-	printf("offset_n: %d\n", offset_n);
 
 	/*handle the points*/
 	printf("Lines\n");
 	int m = lines.size();
 	printf("%d\n", m);
-
 	vector< pair<int, int> > points;
 	const float POINT_EPS = 20.0f;
 	CImg<float> Points_Graph;
@@ -237,15 +234,15 @@ int A4_Correct(string file_name) {
 	}
 	Points_Graph.display("Corner");
 
-	/*output to ../Ans/file_name.txt*/
+	/* output points to "../Ans/file_name.txt" */
 	FILE *fp;
 	string output_file_name = "../Ans/"+file_name+".txt";
 	fp = fopen(output_file_name.c_str(), "w");
 	for (int i = 0; i < points.size(); i++)
-		fprintf(fp , "%d %d\n", (int)(points[i].first/point_index_correct), (int)(points[i].second/point_index_correct));
+		fprintf(fp , "%d,%d\n", (int)(points[i].first/point_index_correct), (int)(points[i].second/point_index_correct));
 	fclose(fp);
 
-	/*morphe*/
+	/* morphe  A4 correct */
 	printf("------------------PAPER CORRECT-------------------\n");
 	int paper_width = width*3/4.0;
 	int paper_height = paper_width/210.0*297.0;
@@ -253,28 +250,23 @@ int A4_Correct(string file_name) {
 		paper_height = height*3/4.0;
 		paper_width = paper_height/297.0*210.0;
 	}
-	
 	vector< Point > points_B;
 	vector< Point > points_A;
 	for (int i = 0; i < 4; i++) points_A.push_back(Point(points[i].first, points[i].second));
-
 	points_B.push_back(Point((width-paper_width)/2, (height-paper_height)/2));
 	points_B.push_back(Point((width-paper_width)/2+paper_width, (height-paper_height)/2));
 	points_B.push_back(Point((width-paper_width)/2+paper_width, (height-paper_height)/2+paper_height));
 	points_B.push_back(Point((width-paper_width)/2, (height-paper_height)/2+paper_height));
-	
 	points_B.push_back(Point(0, height-1));	points_B.push_back(Point(width-1, height-1));
 	points_B.push_back(Point(width-1, 0));	points_B.push_back(Point(0, 0));
 	points_A.push_back(Point(0, height-1));	points_A.push_back(Point(width-1, height-1));
 	points_A.push_back(Point(width-1, 0));	points_A.push_back(Point(0, 0));
-
 	vector<triangle> tri;
 	tri.push_back(triangle(3, 4, 5));	tri.push_back(triangle(2, 3, 5));
 	tri.push_back(triangle(2, 5, 6));	tri.push_back(triangle(1, 2, 6));
 	tri.push_back(triangle(0, 1, 6));	tri.push_back(triangle(0, 6, 7));
 	tri.push_back(triangle(0, 4, 7));	tri.push_back(triangle(0, 3, 4));
 	tri.push_back(triangle(0, 1, 3));	tri.push_back(triangle(1, 2, 3));
-
 	CImg<float> Trans_Graph = Origin_Graph;
 	Trans_Graph.fill(0.0f);
 	cimg_forXY(Trans_Graph, x, y) {
@@ -311,7 +303,8 @@ int A4_Correct(string file_name) {
 	Optimize(Trans_Graph, width, height, paper_width, paper_height);
 	Trans_Graph.display();
 
-	string outfile = "../Output/";      // required input filename
+	/* outpout correct graph*/
+	string outfile = "../Output/";
 	outfile = outfile+file_name+".jpg";
 	Trans_Graph.save(outfile.c_str());
 }

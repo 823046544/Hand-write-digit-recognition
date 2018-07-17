@@ -26,24 +26,30 @@ void hough(const CImg<float> &img, CImg<float> &HoughSpace,
         for (int i = 0; i < theta_n; i++) {
             float theta = theta_step*i;
             float offset = (x-width/2.0)*sin(theta)+(y-height/2.0)*cos(theta);
-            int offset_int = (int) (offset_n*(offset/diagonal+1));
+            int offset_int = round(offset_n*(offset/diagonal+1));
             HoughSpace(i, offset_int)++;
         }
     }
-
+    // HoughSpace.display();
     lines.clear();
-    cimg_forXY(HoughSpace, i, offset) if (i) {
+    // cimg_forXY(HoughSpace, i, offset) {
+    for (int i = 0; i < theta_n; i++)
+    for (int offset = 0; offset < 2*offset_n; offset++) {
         if (HoughSpace(i, offset) > out_thread) {
             bool repetition = false;
             for (int t = 0; t < lines.size(); t++)
-                if (abs(i-lines[t].first) <= 5 && abs(offset-lines[t].second) <= 50) {
-                    // cout << "delete " << i << " " << offset << "  ;  " << lines[t].first << " " << lines[t].second << endl; 
-                    // printf("Delete %d %d due to %d %d\n", i, offset, lines[t].first, lines[t].second);
+                if (abs(i-lines[t].first) <= 20 && abs(offset-lines[t].second) <= 300) {
                     repetition = true;
+                    if (HoughSpace(i, offset) > HoughSpace(lines[t].first, lines[t].second)) {
+                        lines[t].first = i;
+                        lines[t].second = offset;
+                    }
                     break;
                 }
             if (lines.size() >= 4) break;
-            if (!repetition && offset > 1) lines.push_back(make_pair(i, offset));
+            if (!repetition && offset > 1) {
+                lines.push_back(make_pair(i, offset));
+            }
             if (lines.size() >= 4) break;
         }
     }
