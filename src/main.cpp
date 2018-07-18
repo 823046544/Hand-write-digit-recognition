@@ -1,19 +1,12 @@
 #include "a4_correct.h"
 #include "CImg.h"
 using namespace cimg_library;
-#include <opencv2/core.hpp>
-#include <opencv2/imgproc.hpp>
-#include "opencv2/imgcodecs.hpp"
-#include <opencv2/highgui.hpp>
-#include <opencv2/ml.hpp>
 #include <string>
 #include <iostream>
 #include <errno.h>
 #include <sys/wait.h>
 
 using namespace std;
-using namespace cv;
-using namespace cv::ml;
 
 // bfs erase disturb for seperation
 void Erase_extra_disturb(CImg<float> &Img, int x, int y) {
@@ -273,15 +266,6 @@ int main(int argc, char** argv) {
 			}
 		Expand_white(number);
 		number.resize(28, 28);
-		Mat num_mat = Mat::zeros(1, 1 * 28*28, CV_32FC1);
-		Mat num_show = Mat::zeros(28, 28, CV_32FC1);
-		for (int x = 0; x < 28; x++)
-			for (int y = 0; y < 28; y++) {
-				//black <-> white
-				float value = number(x, y) < 50 ? 0.0 : 1.0;
-				num_mat.at<float>(0, x*28+y) = value;
-				num_show.at<float>(x, y) = value;
-			}
 		string temp_dir = "./my_num/"+to_string(i) +".jpg";
 		number.save(temp_dir.c_str());
 	}

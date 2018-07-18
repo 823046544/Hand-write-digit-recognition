@@ -129,6 +129,7 @@ int A4_Correct(string file_name) {
 		point_index_correct = 2300.0/in._width;
 		in.resize(2300, (int)(2300.0/in._width*in._height));
 	}
+	in.display("Original RGB Graph");
 	CImg<float> Origin_Graph = in;
 	const int widthIn = in._width;
 	const int heightIn = in._height;
@@ -149,10 +150,11 @@ int A4_Correct(string file_name) {
 		else Img_edge(x, y) = 255;
 	}
 	// erase noise
-	Recover(Img_edge, 20);
+	Recover(Img_edge, 8);
 	for (int i = Img_edge._width/2-25; i <= Img_edge._width/2+25; i++)
 		for (int j = Img_edge._height/2-25; j <= Img_edge._height/2+25; j++)
 			Detect_edge(Img_edge, i, j);
+	Img_edge.display("OutLine_Detect");
 	cimg_forXY(Img_edge, x, y) {
 		if (Img_edge(x, y) == 50) Img_edge(x, y) = 0;
 		else if (Img_edge(x, y) == 255) Img_edge(x, y) = 0;
@@ -160,6 +162,7 @@ int A4_Correct(string file_name) {
 		else Img_edge(x, y) = 0;
 	}
 	Detect_edge(Img_edge, 0, 0);
+	Img_edge.display("OutLine_Detect");
 	cimg_forXY(Img_edge, x, y) {
 		if (Img_edge(x, y) == 50) Img_edge(x, y) = 0;
 		else if (Img_edge(x, y) == 255) Img_edge(x, y) = 0;

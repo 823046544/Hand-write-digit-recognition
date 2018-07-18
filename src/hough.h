@@ -30,7 +30,7 @@ void hough(const CImg<float> &img, CImg<float> &HoughSpace,
             HoughSpace(i, offset_int)++;
         }
     }
-    // HoughSpace.display();
+    HoughSpace.display("HoughSpace");
     lines.clear();
     // cimg_forXY(HoughSpace, i, offset) {
     for (int i = 0; i < theta_n; i++)
