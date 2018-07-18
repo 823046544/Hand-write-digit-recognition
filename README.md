@@ -44,3 +44,21 @@ python run_test.py
     + Keras
 
 ## 结果
+
+* 读取图片
+![这里写图片描述](https://github.com/823046544/Hand-write-digit-recognition/blob/master/Img/1.jpg)
+
+* Canny 检测边缘
+![这里写图片描述](https://github.com/823046544/Hand-write-digit-recognition/blob/master/Img/2.jpg)
+
+* 检测四个角点
+![这里写图片描述](https://github.com/823046544/Hand-write-digit-recognition/blob/master/Img/3.jpg)
+
+* A4纸矫正
+![这里写图片描述](https://github.com/823046544/Hand-write-digit-recognition/blob/master/Img/4.jpg)
+
+* 数字分割
+![这里写图片描述](https://github.com/823046544/Hand-write-digit-recognition/blob/master/Img/5.jpg)
+
+* 最终结果：包含四个角点以及识别内容
+![这里写图片描述](https://github.com/823046544/Hand-write-digit-recognition/blob/master/Img/0.jpg)
