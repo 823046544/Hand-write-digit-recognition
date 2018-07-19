@@ -190,7 +190,7 @@ void Canny_Separate(CImg<float> &Paper_Graph) {
 			}
 		}
 	}
-	Paper_Graph.display("Origin");
+	// Paper_Graph.display("Origin");
 }
 
 int main(int argc, char** argv) {
@@ -236,16 +236,20 @@ int main(int argc, char** argv) {
 		Paper_Graph.draw_line(B[i].x+B[i].w, B[i].y, B[i].x+B[i].w, B[i].y+B[i].h, black);
 		Paper_Graph.draw_line(B[i].x, B[i].y+B[i].h, B[i].x+B[i].w, B[i].y+B[i].h, black);
 	}
-	Paper_Graph.display();
+	// Paper_Graph.display();
 	Paper_Graph = temp;
 
 	/* CNN digit recognize */
 	printf("------------------CNN PREDICT-------------------\n");
 	//half of the max height as threshold
-	float h_threshold = 0;
-	for (int i = 0; i < B.size(); i++) if (B[i].h > h_threshold)
-		h_threshold = B[i].h;
-	h_threshold /= 2;
+	vector<int> Box_Height;
+	Box_Height.clear();
+	for (int i = 0; i < B.size(); i++) Box_Height.push_back(B[i].h);
+	sort(Box_Height.begin(), Box_Height.end());
+	float h_threshold = 1.0 * Box_Height[Box_Height.size() - 15] / 2.0;
+	// for (int i = 0; i < B.size(); i++) if (B[i].h > h_threshold)
+	// 	h_threshold = B[i].h;
+	// h_threshold /= 3;
 	B[0].l = 1;
 	//separate lines
 	for (int i = 1; i < B.size(); i++) {

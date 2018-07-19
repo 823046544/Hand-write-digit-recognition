@@ -129,7 +129,7 @@ int A4_Correct(string file_name) {
 		point_index_correct = 2300.0/in._width;
 		in.resize(2300, (int)(2300.0/in._width*in._height));
 	}
-	in.display("Original RGB Graph");
+	// in.display("Original RGB Graph");
 	CImg<float> Origin_Graph = in;
 	const int widthIn = in._width;
 	const int heightIn = in._height;
@@ -144,17 +144,17 @@ int A4_Correct(string file_name) {
     float sigma = 1.5f;
 	float threshold = 4.0f;
     CannyDiscrete(in, sigma, threshold, Img_edge);
-    Img_edge.display("non-maximum suppression");
+    // Img_edge.display("non-maximum suppression");
 	cimg_forXY(Img_edge, x, y) {
 		if (Img_edge(x, y) < 100) Img_edge(x, y) = 0;
 		else Img_edge(x, y) = 255;
 	}
 	// erase noise
-	Recover(Img_edge, 8);
+	Recover(Img_edge, 10);
 	for (int i = Img_edge._width/2-25; i <= Img_edge._width/2+25; i++)
 		for (int j = Img_edge._height/2-25; j <= Img_edge._height/2+25; j++)
 			Detect_edge(Img_edge, i, j);
-	Img_edge.display("OutLine_Detect");
+	// Img_edge.display("OutLine_Detect");
 	cimg_forXY(Img_edge, x, y) {
 		if (Img_edge(x, y) == 50) Img_edge(x, y) = 0;
 		else if (Img_edge(x, y) == 255) Img_edge(x, y) = 0;
@@ -162,14 +162,14 @@ int A4_Correct(string file_name) {
 		else Img_edge(x, y) = 0;
 	}
 	Detect_edge(Img_edge, 0, 0);
-	Img_edge.display("OutLine_Detect");
+	// Img_edge.display("OutLine_Detect");
 	cimg_forXY(Img_edge, x, y) {
 		if (Img_edge(x, y) == 50) Img_edge(x, y) = 0;
 		else if (Img_edge(x, y) == 255) Img_edge(x, y) = 0;
 		else if (Img_edge(x, y) == 100) Img_edge(x, y) = 255;
 		else Img_edge(x, y) = 0;
 	}
-	Img_edge.display("OutLine_Detect");
+	// Img_edge.display("OutLine_Detect");
 
 	/* handle the lines */
 	vector< pair<int, int> > lines;
@@ -206,7 +206,7 @@ int A4_Correct(string file_name) {
 			}
 		}
 	}
-	Points_Graph.display("Lines");
+	// Points_Graph.display("Lines");
 
 	/*find points*/
 	cimg_forXY(Points_Graph, x, y) if (Points_Graph(x, y) && x > 0 && x < width-1 && y > 0 && y < height-1) {
@@ -235,7 +235,7 @@ int A4_Correct(string file_name) {
 		float y = points[i].second;
 		Points_Graph.draw_circle(x, y, 25, red, 1);
 	}
-	Points_Graph.display("Corner");
+	// Points_Graph.display("Corner");
 
 	/* output points to "../Ans/file_name.txt" */
 	FILE *fp;
@@ -304,7 +304,7 @@ int A4_Correct(string file_name) {
 		}
 	}
 	Optimize(Trans_Graph, width, height, paper_width, paper_height);
-	Trans_Graph.display();
+	// Trans_Graph.display();
 
 	/* outpout correct graph*/
 	string outfile = "../Output/";

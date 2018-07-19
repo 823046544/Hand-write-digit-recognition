@@ -30,7 +30,7 @@ void hough(const CImg<float> &img, CImg<float> &HoughSpace,
             HoughSpace(i, offset_int)++;
         }
     }
-    HoughSpace.display("HoughSpace");
+    // HoughSpace.display("HoughSpace");
     lines.clear();
     // cimg_forXY(HoughSpace, i, offset) {
     for (int i = 0; i < theta_n; i++)
@@ -38,7 +38,7 @@ void hough(const CImg<float> &img, CImg<float> &HoughSpace,
         if (HoughSpace(i, offset) > out_thread) {
             bool repetition = false;
             for (int t = 0; t < lines.size(); t++)
-                if (abs(i-lines[t].first) <= 20 && abs(offset-lines[t].second) <= 300) {
+                if (abs(i-lines[t].first) <= 20 && abs(offset-lines[t].second) <= 800) {
                     repetition = true;
                     if (HoughSpace(i, offset) > HoughSpace(lines[t].first, lines[t].second)) {
                         lines[t].first = i;

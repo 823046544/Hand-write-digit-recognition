@@ -26,6 +26,7 @@ K.set_image_dim_ordering('th')
 model = load_model('./cnn_model.h5')
 # model = load_model('./nn_model.h5')
 Ans = ''
+pre_ans = ''
 index = 1
 for i in range(L[0]):
     img = cv2.imread('./my_num/'+str(i)+'.jpg', cv2.IMREAD_GRAYSCALE)
@@ -49,8 +50,9 @@ for i in range(L[0]):
     if (index < len(L) and i == L[index]):
         index = index+1
         Ans = Ans+'\n'
-        if (len(Ans) < 3):
-            Ans = ''
+        if (len(Ans)-len(pre_ans) <= 3):
+            Ans = pre_ans
+        pre_ans = Ans
 
 file_name = sys.argv[1]
 file_path = '../Ans/'+file_name+'.txt'

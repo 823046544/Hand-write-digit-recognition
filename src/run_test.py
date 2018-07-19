@@ -13,6 +13,6 @@ def run(file_dir):
                 print(file_name)
                 command = './main '+file_name
                 os.system(command)
-                time.sleep(5)
+                time.sleep(10)
 
 run('../Dataset/')
